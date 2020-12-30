@@ -1,0 +1,15 @@
+inclement - srogi, surowy
+explicitly - wyraźnie, jawnie
+inherit - dziedziczyć
+derived - pochodzący
+layer - warstwa
+pattern - wzór (do wzorców projektowych)
+accordingly - odpowiednio, konsekwentnie
+provide - dostarczać
+geared - nastawiony
+indentation - wcięcie (np. wiersza)
+either - albo
+essentially - zasadniczo
+instantiate - tworzyć instancję
+entirely - całkowicie
+syntax - składnia

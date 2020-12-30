@@ -1,0 +1,59 @@
+#:import slownik main.slownik
+<MainWidget>:
+	cols: 1
+	StackLayout:
+		cols: 1
+		Label:
+			id: mainlabel
+			font_size: 70
+			size_hint: (1, 0.8)
+			multiline: True
+		GridLayout:
+			id: opcje
+			visible: True
+			cols: 2
+			size_hint: (1, 0.12) if self.visible else (0,0)
+			opacity: 1 if self.visible else 0
+			Label:
+				id: ileslowek
+				text: 'Ile słowek?    '
+			Button:
+				text: 'Start!'
+				on_press:
+					root.inicjuj()
+			Slider:
+				id: sliderslowek
+				disabled: switcher.active
+				max: len(slownik)-1
+				value: 0
+				on_touch_move: 
+					ileslowek.text = 'Ile słowek?    [' + str(int(self.value)) + ']'
+			GridLayout:
+				cols: 2
+				Label:
+					text: 'Wszystkie:'
+				Switch:
+					id: switcher
+					active: False
+					on_active:
+						sliderslowek.value = sliderslowek.max
+						ileslowek.text = 'Ile słowek?    [' + str(int(sliderslowek.value)) + ']'
+
+		ProgressBar:
+			id: status
+			value: 0
+			max: len(slownik)
+			size_hint_y: None
+			height: 50
+	TextInput:
+		text_validate_unfocus: False
+		id: text_input
+		size_hint_y: None
+		height: 100
+		text: 'ustaw i zacznij wpisywać'
+		font_size: 70
+		multiline: False
+		on_text_validate: 
+			status.value+=1
+			self.focus: True
+			root.runda()
