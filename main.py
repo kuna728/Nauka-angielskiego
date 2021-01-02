@@ -5,6 +5,7 @@ from kivy.properties import ListProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics import Rectangle, Color
 from kivy.clock import Clock
+from kivy.uix.screenmanager import ScreenManager, Screen
 import random
 
 slownik = {}
@@ -17,55 +18,65 @@ plik.close()
 
 zleodp = {}
 
-class MainWidget(GridLayout):
+sm = ScreenManager()
+
+class MainScreen(Screen):
 	licznik = 0
 	licznik_zlych = 0
 	klucz = 0
 	def on_text_validate():
 		print('test')
 	def inicjuj(self):
+		global zleodp
+		zleodp ={}
+		MainScreen.licznik = 0 
+		MainScreen.licznik_zlych=0
+		MainScreen.klucz=0
 		self.ids.status.max = int(self.ids.sliderslowek.value)
 		self.ids.text_input.text = ''
 		self.ids.opcje.visible = False
 		index = random.randint(0, len(slownik)-1)
-		MainWidget.klucz = list(slownik)[index]
-		self.ids.mainlabel.text = slownik[MainWidget.klucz]
+		MainScreen.klucz = list(slownik)[index]
+		self.ids.mainlabel.text = slownik[MainScreen.klucz]
 		canvas_color = ListProperty([1,1,1,1])
 
 	def koncz_runde(self, dt):
 		self.ids.mainlabel.color = 1, 1, 1, 1
-		del slownik[MainWidget.klucz]
-		if MainWidget.licznik == int(self.ids.sliderslowek.value):
-			self.podsumowanie()
+		del slownik[MainScreen.klucz]
+		if MainScreen.licznik == int(self.ids.sliderslowek.value):
+			self.ids.text_input.readonly=True
+			sm.current = 'score'
 		else:
 			index = random.randint(0, len(slownik)-1)
-			MainWidget.klucz = list(slownik)[index]
-			self.ids.mainlabel.text = slownik[MainWidget.klucz]
+			MainScreen.klucz = list(slownik)[index]
+			self.ids.mainlabel.text = slownik[MainScreen.klucz]
 
 	def runda(self):
 		odp = self.ids.text_input.text
 		self.ids.text_input.text = ''
-		klucz = MainWidget.klucz
-		MainWidget.licznik+=1
+		klucz = MainScreen.klucz
+		MainScreen.licznik+=1
 		if odp != klucz:
-			MainWidget.licznik_zlych+=1
+			MainScreen.licznik_zlych+=1
 			zleodp[klucz] = slownik[klucz]
 			self.ids.mainlabel.color = 1, 0, 0, 1
 		else:
 			self.ids.mainlabel.color = 60/255, 179/255, 113/255, 1
 		Clock.schedule_once(self.koncz_runde, .5)
 
+class ScoreScreen(Screen):
 	def podsumowanie(self):
-		dobrych = MainWidget.licznik - MainWidget.licznik_zlych
-		self.ids.text_input.readonly=True
-		self.ids.mainlabel.text = '''KONIEC\nPoprawnych: 
-		{0}\nBłednych: {1}\n Procentowo: {2}%
-		'''.format(str(dobrych), str(MainWidget.licznik_zlych), str(100*dobrych/MainWidget.licznik))
-
+		dobrych = MainScreen.licznik - MainScreen.licznik_zlych
+		podsumowanie = '''KONIEC\nPoprawnych: {0}\nBlednych: {1}\nProcentowo: {2}%\n\nZłe odpowiedzi:\n'''.format(str(dobrych), str(MainScreen.licznik_zlych), str(100*dobrych/MainScreen.licznik))
+		for i in zleodp:
+			podsumowanie+= '{0} - {1}\n'.format(i,zleodp[i])
+		self.ids.podsumowanie.text = podsumowanie
 
 class WordsApp(App):
 	def build(self):
-		return MainWidget()
+		sm.add_widget(MainScreen(name='main'))
+		sm.add_widget(ScoreScreen(name='score'))
+		return sm
 
 if __name__ == "__main__":
 	WordsApp().run()
