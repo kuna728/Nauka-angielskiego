@@ -1,12 +1,7 @@
 #:import slownik main.slownik
 <MainScreen>:
-	on_enter: 
-		root.inicjuj()
-		text_input.text = 'ustaw i zacznij wpisywać'
-		opcje.visible = True
-		mainlabel.text = ''
-		status.value = 0
-		text_input.readonly = False
+	on_enter:
+		root.manager.transition.direction = 'left'
 	GridLayout:
 		cols: 1
 		StackLayout:
@@ -68,15 +63,28 @@
 				status.value+=1
 				self.focus: True
 				root.runda()
+			valign: 'bottom'
+			halign: 'center'
 
 <ScoreScreen>:
 	on_enter: 
 		root.podsumowanie()
-	StackLayout:
-		Label:
-			id: podsumowanie
-			size_hint_y: 0.8
+	BoxLayout:
+		orientation: 'vertical'
+		ScrollView:
+			size_hint: 1, 0.8
+			Label:
+				id: podsumowanie
+				markup: True
+				size_hint_y: None
+				text_size: self.width, None
+				height: self.texture_size[1]
+				halign: 'center'
 		Button:
-			text: 'Powrot'
-			on_press: root.manager.current = 'main'
+			size_hint: 1, 0.2
+			text: 'Powrót'
+			font_size: 40
+			on_press:
+				root.manager.transition.direction = 'right' 
+				root.manager.current = 'main'
 
